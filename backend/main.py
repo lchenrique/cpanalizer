@@ -107,6 +107,11 @@ async def solve_captcha_endpoint(file: UploadFile = File(...)):
             "error": str(e)
         }
 
+@app.get("/")
+async def root():
+    """Rota raiz para evitar 404 e indicar a documentação."""
+    return {"message": "CPAnalizer API. Acesse /docs para a documentação interativa."}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000) 
