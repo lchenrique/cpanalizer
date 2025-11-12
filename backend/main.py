@@ -3,8 +3,16 @@ import io
 from PIL import Image
 import numpy as np
 import cv2
-import tensorflow as tf
 import os
+
+# Limitar threads e reduzir logs antes de importar tensorflow para diminuir
+# uso de memória e ruído de inicialização.
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("TF_NUM_INTRAOP_THREADS", "1")
+os.environ.setdefault("TF_NUM_INTEROP_THREADS", "1")
+
+import tensorflow as tf
 from solve_captcha import solve_captcha
 
 app = FastAPI()
@@ -17,7 +25,8 @@ def load_model():
     try:
         if not os.path.exists('captcha_model.h5'):
             raise FileNotFoundError("Arquivo do modelo não encontrado")
-        model = tf.keras.models.load_model('captcha_model.h5')
+        # Carregar sem compilar reduz memória e evita carregar otimizações extras
+        model = tf.keras.models.load_model('captcha_model.h5', compile=False)
         print("Modelo carregado com sucesso!")
     except Exception as e:
         print(f"Erro ao carregar o modelo: {str(e)}")
